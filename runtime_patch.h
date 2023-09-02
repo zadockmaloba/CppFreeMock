@@ -9,6 +9,7 @@
 #define CPP_FREE_MOCK_RUNTIME_PATCH_H_
 
 #include <vector>
+#include <setjmp.h>
 
 namespace CppFreeMock {
 
@@ -25,6 +26,8 @@ namespace RuntimePatcherImpl {
 
 #if defined(__x86_64__) || defined(__i386__)
 #include "x86/runtime_patch_impl.h"
+#else
+#include "arm/runtime_patch_impl.h"
 #endif
 
 #ifdef __APPLE__
