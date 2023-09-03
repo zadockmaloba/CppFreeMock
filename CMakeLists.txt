@@ -12,6 +12,7 @@ include_directories(
     arm
     win32
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${GTEST_INCLUDE_DIRS}
 )
 
 target_link_libraries(CppFreeMockTest
