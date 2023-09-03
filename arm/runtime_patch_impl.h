@@ -34,12 +34,20 @@ namespace RuntimePatcherImpl {
         return distance;
     }
 
-    // PatchFunction32bitDistance and PatchFunction64bitAddress only support x86 platform.
     static void PatchFunction32bitDistance(char* const function, const std::size_t distance) {
-        const char* const distance_bytes = reinterpret_cast<const char*>(&distance);
-        // instruction: b 0x********;
-        function[0] = 0x14; // branch
-        std::copy(distance_bytes, distance_bytes + 4, function + 1);
+        // Calculate the relative offset from the current instruction to the target address
+        std::ptrdiff_t offset = reinterpret_cast<std::ptrdiff_t>(function) - distance;
+
+        // Convert the offset to a 32-bit signed integer (AArch64 instructions use signed offsets)
+        int32_t offset32 = static_cast<int32_t>(offset);
+
+        // Store the branch instruction (B) and the offset in the function
+        // The branch instruction format in AArch64 is: B <offset>
+        // The offset is a signed 26-bit value, shifted right by 2 bits (to ensure it's word-aligned)
+        uint32_t branch_instruction = 0x14000000 | ((offset32 >> 2) & 0x03FFFFFF);
+
+        // Copy the 32-bit instruction to the function
+        std::memcpy(function, &branch_instruction, sizeof(branch_instruction));
     }
 
     static int SetJump(void* const address, const void* const destination, std::vector<char>& binary_backup) {
