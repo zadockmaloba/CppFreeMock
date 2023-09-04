@@ -31,7 +31,7 @@ namespace RuntimePatcherImpl {
     static std::size_t CalculateDistance(const void* const address, const void* const destination) {
         std::size_t distance = reinterpret_cast<std::size_t>(destination)
             - reinterpret_cast<std::size_t>(address)
-            - 5; // For jmp instruction;
+            - 4; // For jmp instruction;
         return distance;
     }
 
@@ -51,12 +51,29 @@ namespace RuntimePatcherImpl {
         std::memcpy(function, &branch_instruction, sizeof(branch_instruction));
     }
 
-    static int SetJump(void* const address, const void* const destination, std::vector<char>& binary_backup) {
+    static void PatchFunction32bitDistance(void *target, void *replacement) {
+        // Calculate the relative offset for the branch instruction
+        uintptr_t rel = (uintptr_t)replacement - (uintptr_t)target;
+
+        // Generate the AARCH64 branch instruction
+        // AARCH64 uses a different instruction format
+        // The branch instruction format is: B <offset>
+        // We need to calculate the offset properly
+        uint32_t instr = 0;
+        int32_t offset = rel >> 2; // Right-shift by 2, as the offset is in words, not bytes
+        instr = (instr & 0xFFFFFC00) | (offset & 0x3FF); // Set the offset bits in the instruction
+
+        // Write the instruction to the target address
+        *(uint32_t *)target = instr;
+    }
+
+    static int SetJump(void* const address, void* const destination, std::vector<char>& binary_backup) {
         char* const function = reinterpret_cast<char*>(address);
+        const char* const replacement = reinterpret_cast<const char*>(destination);
         std::size_t distance = CalculateDistance(address, destination);
         
-        BackupBinary(function, binary_backup, 5); // branch.
-        PatchFunction32bitDistance(function, distance);
+        BackupBinary(function, binary_backup, 4); // branch.
+        PatchFunction32bitDistance(address, destination);
 
         return 0;
     }
