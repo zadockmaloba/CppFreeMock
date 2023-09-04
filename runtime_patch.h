@@ -44,6 +44,7 @@ namespace CppFreeMock {
 struct RuntimePatcher {
     template < typename F1, typename F2 >
     static int GraftFunction(F1 address, F2 destination, std::vector<char>& binary_backup) {
+        #if defined(__x86_64__) || defined(__i386__)
         void* function = reinterpret_cast<void*>((std::size_t&)address);
         if (0 != RuntimePatcherImpl::UnprotectMemoryForOnePage(function)) {
             std::abort();
@@ -51,6 +52,9 @@ struct RuntimePatcher {
             // For mock std::abort, this need not after the 'if'.
             return RuntimePatcherImpl::SetJump(function, reinterpret_cast<void*>((std::size_t&)destination), binary_backup);
         }
+        #else
+            return RuntimePatcherImpl::SetJump(function, reinterpret_cast<void*>((std::size_t&)destination), binary_backup);
+        #endif
     }
 
     template < typename F >

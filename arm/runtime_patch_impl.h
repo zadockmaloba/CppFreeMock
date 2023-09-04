@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <cstring>
 #include <vector>
+#include <sys/mman.h>
 
 namespace CppFreeMock {
 
@@ -52,19 +53,27 @@ namespace RuntimePatcherImpl {
     }
 
     static void PatchFunction32bitDistance(void *target, void *replacement) {
+        assert(((uintptr_t)target & 0x07) == 0); // 8-byte aligned?
+
+        // Calculate the page address containing the target
+        void *page = (void *)((uintptr_t)target & ~0xFFF);
+
+        // Make the page writable and executable
+        mprotect(page, 4096, PROT_WRITE | PROT_EXEC);
+
         // Calculate the relative offset for the branch instruction
         uintptr_t rel = (uintptr_t)replacement - (uintptr_t)target;
 
         // Generate the AARCH64 branch instruction
-        // AARCH64 uses a different instruction format
-        // The branch instruction format is: B <offset>
-        // We need to calculate the offset properly
-        uint32_t instr = 0;
-        int32_t offset = rel >> 2; // Right-shift by 2, as the offset is in words, not bytes
-        instr = (instr & 0xFFFFFC00) | (offset & 0x3FF); // Set the offset bits in the instruction
+        // AARCH64 uses the B instruction
+        uint32_t instr = 0xE0000000; // B opcode
+        instr |= ((rel >> 2) & 0x03FFFFFF); // Offset in words, not bytes
 
         // Write the instruction to the target address
         *(uint32_t *)target = instr;
+
+        // Restore the page protection to executable only
+        mprotect(page, 4096, PROT_EXEC);
     }
 
     static int SetJump(void* const address, void* const destination, std::vector<char>& binary_backup) {
