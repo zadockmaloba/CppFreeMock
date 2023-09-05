@@ -12,6 +12,9 @@
 #include <cstdint>
 #include <vector>
 
+#include "Hooker.h"
+#include "HookerFactory.h"
+
 namespace CppFreeMock {
 
 namespace RuntimePatcherImpl {
@@ -41,6 +44,14 @@ namespace RuntimePatcherImpl {
         function[0] = 0xE9; // jmp
         std::copy(distance_bytes, distance_bytes + 4, function + 1);
     }
+
+    static void PatchFunction(void* function, void* replacement) {
+        using namespace hooker;
+        std::unique_ptr<HookerFactory> factory = HookerFactory::getInstance();
+        const Hooker& hooker = factory->getHooker();
+        hooker.hook(function, replacement, NULL);
+    }
+
 /*
     static void PatchFunction64bitAddress(char* const function, const void* const destination) {
         const char* const distance_bytes = reinterpret_cast<const char*>(&destination);
@@ -59,18 +70,22 @@ namespace RuntimePatcherImpl {
         function[13] = 0xC3; // ret
     }*/
 
-    static int SetJump(void* const address, const void* const destination, std::vector<char>& binary_backup) {
-        char* const function = reinterpret_cast<char*>(address);
-        std::size_t distance = CalculateDistance(address, destination);
+    static int SetJump(void* address, void* destination, std::vector<char>& binary_backup) {
+        // char* const function = reinterpret_cast<char*>(address);
+        //std::size_t distance = CalculateDistance(address, destination);
         
-        BackupBinary(function, binary_backup, 5); // short jmp.
-        PatchFunction32bitDistance(function, distance);
+        //BackupBinary(function, binary_backup, 5); // short jmp.
+        PatchFunction(destination, address);
 
         return 0;
     }
 
     static void RevertJump(void* address, const std::vector<char>& binary_backup) {
-        std::copy(binary_backup.begin(), binary_backup.end(), reinterpret_cast<char*>(address));
+        //std::copy(binary_backup.begin(), binary_backup.end(), reinterpret_cast<char*>(address));
+        /*using namespace hooker;
+        std::unique_ptr<HookerFactory> factory = HookerFactory::getInstance();
+        const Hooker& hooker = factory->getHooker();
+        hooker.unhook(address, binary_b);*/
     }
 }
 

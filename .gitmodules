@@ -1,3 +1,6 @@
 [submodule "And64InlineHook"]
 	path = And64InlineHook
 	url = https://github.com/zadockmaloba/And64InlineHook
+[submodule "inline-hook"]
+	path = inline-hook
+	url = https://github.com/zadockmaloba/inline-hook
