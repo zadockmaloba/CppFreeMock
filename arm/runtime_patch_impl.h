@@ -62,7 +62,7 @@ namespace RuntimePatcherImpl {
         using namespace hooker;
         std::unique_ptr<HookerFactory> factory = HookerFactory::getInstance();
         const Hooker& hooker = factory->getHooker();
-        hooker.hook(function, replacement, NULL);
+        hooker.hook(function, replacement, &function);
     }
 
     static int SetJump(void* address, void* destination, std::vector<char>& binary_backup) {
