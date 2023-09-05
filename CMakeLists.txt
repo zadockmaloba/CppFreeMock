@@ -3,7 +3,7 @@ project(CppFreeMockTest)
 
 find_package(GTest REQUIRED)
 
-add_executable(CppFreeMockTest hello_world.cpp)
+add_executable(CppFreeMockTest hello_world.cpp And64InlineHook/And64InlineHook.cpp)
 
 include_directories(
     cpp11
@@ -12,6 +12,7 @@ include_directories(
     arm
     win32
     ${CMAKE_CURRENT_SOURCE_DIR}
+    ${CMAKE_CURRENT_SOURCE_DIR}/And64InlineHook
     ${GTEST_INCLUDE_DIRS}
 )
 
