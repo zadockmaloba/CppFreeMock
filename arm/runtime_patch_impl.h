@@ -53,15 +53,11 @@ namespace RuntimePatcherImpl {
         std::memcpy(function, &branch_instruction, sizeof(branch_instruction));
     }
 
-    static void PatchFunction32bitDistance(void *target, void *replacement) {
-        A64HookFunction(target, replacement, NULL);
-    }
-
     static void PatchFunction(void* function, void* replacement) {
         using namespace hooker;
         std::unique_ptr<HookerFactory> factory = HookerFactory::getInstance();
         const Hooker& hooker = factory->getHooker();
-        hooker.hook(function, replacement, &function);
+        hooker.hook(function, replacement, NULL, false);
     }
 
     static int SetJump(void* address, void* destination, std::vector<char>& binary_backup) {
