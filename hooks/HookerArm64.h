@@ -24,6 +24,7 @@ namespace hooker {
 inline void hooker::HookerArm64::doHook(void *func, void *newAddr, void **origFunc) const {
     // Cast the function pointer to the appropriate type
     try {
+        /*
         uintptr_t *targetFunc = reinterpret_cast<uintptr_t*>(func);
 
         // Store the original function address if requested
@@ -40,7 +41,7 @@ inline void hooker::HookerArm64::doHook(void *func, void *newAddr, void **origFu
         targetFunc[1] = jumpAddress;
     } catch(...) {
         fprintf(stderr, "Unable to perform inline function hooking.\n");
-    }
+    }*/
 
 /*
 #ifdef cacheflush
