@@ -47,7 +47,7 @@ namespace hooker {
     protected:
         virtual void doHook(void *func, void *newAddr, void **origFunc) const = 0;
         virtual void doUnHook(void *func, void *oldFunc = nullptr) const;
-        mutable std::unordered_map<long,long> gHookedMap;
+        mutable std::unordered_map<std::size_t,std::size_t> gHookedMap;
     private:
         void saveOriginFuncBytes(void *func) const;
     };
@@ -65,7 +65,7 @@ inline hooker::Hooker::~Hooker() {}
 
 inline void hooker::Hooker::changeCodeAttrs(void *func, int attr) const {
     int pagesize = getpagesize();
-    long start = PAGE_START((long)func,pagesize);
+    std::size_t start = PAGE_START((std::size_t)func,pagesize);
 
      if (mprotect((void *)start, (size_t)pagesize, attr) < 0) {
         throw hooker::error::HookerError("mprotect error");
@@ -94,7 +94,7 @@ inline void hooker::Hooker::saveOriginFuncBytes(void *func) const {
 
 	// save the origin bytes here.
     memcpy(save_bytes,func,hookHeadSize);
-    gHookedMap[(long)func] = (long)(save_bytes);
+    gHookedMap[(std::size_t)func] = (std::size_t)(save_bytes);
 
 	// and now, we want to insert a jump to the next instruction
 	// after the hooked start.
@@ -111,12 +111,12 @@ inline void hooker::Hooker::doUnHook(void *func, void *oldfunc) const {
 		changeCodeAttrs(oldfunc, CODE_WRITE);
 		free(oldfunc);
 	}
-    long addr = gHookedMap[(long)func];
+    std::size_t addr = gHookedMap[(std::size_t)func];
     if (addr == 0)
         throw hooker::error::HookerError("it must be hooked before");
     memcpy(func,(void *)addr,getHookHeadSize());
     free((void *)addr);
-	gHookedMap.erase((long)func);
+	gHookedMap.erase((std::size_t)func);
 }
 
 inline void hooker::Hooker::unhook(void *func, void *oldfunc) const {

@@ -48,7 +48,7 @@ inline void hooker::HookerX64::doHook(void *func,void *newAddr,void **origFunc) 
 
     *(uint16_t *)&f[0] = 0x25ff;
     *(int *)&f[2] = 0x00000000;
-    *(long *)&f[6] = (long)newAddr;
+    *(std::size_t *)&f[6] = (std::size_t)newAddr;
 }
 #endif //__x86_64__
 
