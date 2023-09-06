@@ -23,8 +23,7 @@ namespace hooker {
 
 inline void hooker::HookerArm64::doHook(void *func, void *newAddr, void **origFunc) const {
     // Cast the function pointer to the appropriate type
-    try {
-        /*
+    /*try {
         uintptr_t *targetFunc = reinterpret_cast<uintptr_t*>(func);
 
         // Store the original function address if requested
