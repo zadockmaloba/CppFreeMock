@@ -13,7 +13,7 @@
 #include <cstring>
 #include <vector>
 #include <sys/mman.h>
-#include "Hooker.h"
+#include "Hooker.h" //Used to replace inline function with mock function
 
 namespace CppFreeMock {
 

@@ -20,8 +20,11 @@ public:
 
 #include <cstdlib>
 #include <string>
+#ifndef WIN32
 #include <sys/mman.h>
-#include "Hooker.h"
+#else
+#include <win32/mman_win32.h>
+#endif
 #include "memory.h"
 #include <iostream>
 
@@ -48,7 +51,7 @@ inline void hooker::HookerX64::doHook(void *func,void *newAddr,void **origFunc) 
 
     *(uint16_t *)&f[0] = 0x25ff;
     *(int *)&f[2] = 0x00000000;
-    *(std::size_t *)&f[6] = (std::size_t)newAddr;
+    *(long *)&f[6] = (std::size_t)newAddr;
 }
 #endif //__x86_64__
 

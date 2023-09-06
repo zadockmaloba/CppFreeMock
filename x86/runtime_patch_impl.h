@@ -12,7 +12,7 @@
 #include <cstdint>
 #include <vector>
 
-#include "Hooker.h"
+#include "Hooker.h" //Used to replace inline function with mock function
 
 namespace CppFreeMock {
 
@@ -70,17 +70,24 @@ namespace RuntimePatcherImpl {
     }*/
 
     static int SetJump(void* address, void* destination, std::vector<char>& binary_backup) {
-        // char* const function = reinterpret_cast<char*>(address);
-        //std::size_t distance = CalculateDistance(address, destination);
-        
-        //BackupBinary(function, binary_backup, 5); // short jmp.
+
+
+#ifndef WIN32
         PatchFunction(address, destination);
+#else
+        char* const function = reinterpret_cast<char*>(address); \
+        std::size_t distance = CalculateDistance(address, destination);
+        BackupBinary(function, binary_backup, 5); // short jmp.
+        PatchFunction32bitDistance(function,distance);
+#endif
 
         return 0;
     }
 
     static void RevertJump(void* address, const std::vector<char>& binary_backup) {
-        //std::copy(binary_backup.begin(), binary_backup.end(), reinterpret_cast<char*>(address));
+#ifdef WIN32
+        std::copy(binary_backup.begin(), binary_backup.end(), reinterpret_cast<char*>(address));
+#endif
         /*using namespace hooker;
         std::unique_ptr<HookerFactory> factory = HookerFactory::getInstance();
         const Hooker& hooker = factory->getHooker();

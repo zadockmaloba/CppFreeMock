@@ -232,5 +232,11 @@ inline int munlock(const void *addr, size_t len)
     return -1;
 }
 
+inline static size_t getpagesize() {
+    SYSTEM_INFO sSysInfo;
+    GetSystemInfo(&sSysInfo);
+    return sSysInfo.dwPageSize;
+}
+
 
 #endif /*  _SYS_MMAN_H_ */

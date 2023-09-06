@@ -14,14 +14,6 @@ namespace CppFreeMock {
 
 namespace RuntimePatcherImpl {
 
-#ifdef WIN32
-static size_t getpagesize() {
-    SYSTEM_INFO sSysInfo;
-    GetSystemInfo(&sSysInfo);
-    return sSysInfo.dwPageSize;
-}
-#endif
-
 static std::size_t PageSize = getpagesize();
 
 // return 0 for success, otherwire for error.

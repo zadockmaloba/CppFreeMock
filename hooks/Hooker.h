@@ -54,7 +54,11 @@ namespace hooker {
 }
 
 #include <unistd.h>
+#ifndef WIN32
 #include <sys/mman.h>
+#else
+#include "../win32/mman_win32.h"
+#endif
 #include <cstdio>
 #include <string>
 #include <cstdlib>
@@ -116,7 +120,7 @@ inline void hooker::Hooker::doUnHook(void *func, void *oldfunc) const {
         throw hooker::error::HookerError("it must be hooked before");
     memcpy(func,(void *)addr,getHookHeadSize());
     free((void *)addr);
-	gHookedMap.erase((std::size_t)func);
+    gHookedMap.erase((std::size_t)func);
 }
 
 inline void hooker::Hooker::unhook(void *func, void *oldfunc) const {
