@@ -13,7 +13,6 @@
 #include <vector>
 
 #include "Hooker.h"
-#include "HookerFactory.h"
 
 namespace CppFreeMock {
 
@@ -75,7 +74,7 @@ namespace RuntimePatcherImpl {
         //std::size_t distance = CalculateDistance(address, destination);
         
         //BackupBinary(function, binary_backup, 5); // short jmp.
-        PatchFunction(destination, address);
+        PatchFunction(address, destination);
 
         return 0;
     }
