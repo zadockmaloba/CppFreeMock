@@ -22,6 +22,7 @@ namespace hooker {
 
 inline void hooker::HookerArm64::doHook(void *func, void *newAddr, void **origFunc) const {
     // Cast the function pointer to the appropriate type
+    /*
     uintptr_t *targetFunc = reinterpret_cast<uintptr_t*>(func);
 
     // Store the original function address if requested
@@ -36,6 +37,12 @@ inline void hooker::HookerArm64::doHook(void *func, void *newAddr, void **origFu
     // Write the jump instruction and the jump address
     targetFunc[0] = jumpInstruction;
     targetFunc[1] = jumpAddress;
+    */
+    uintptr_t *target = reinterpret_cast<uintptr_t*>(func);
+    unsigned char code[] = { 0x43, 0x00, 0x00, 0x58, 0x60, 0x00, 0x3F, 0xD6 };
+    memcpy(target, code, 8);
+    *(void (**)())(target + 8) = newAddr;
+   
 
 /*
 #ifdef cacheflush
